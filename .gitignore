@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# PyInstaller 构建产物
+build/
+dist/
+*.spec
+
+# 运行数据 / 缓存（体积大且含个人数据）
+.thumbs/
+.data/
+stream.log
+config.json
+
+# 本地测试媒体
+media/
+
+# IDE / 工具临时文件
+.vscode/
+.idea/
+.screenshots/
+.trae-html-share-packages/
+*.tmp

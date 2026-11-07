@@ -1,0 +1,276 @@
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STREAM · 视频管理器</title>
+  <link rel="stylesheet" href="/static/css/style.css?v=16">
+</head>
+<body>
+
+  <header id="navbar">
+    <div class="nav-left">
+      <a class="logo" href="#" onclick="return false;">STREAM</a>
+      <nav class="nav-links" id="catNav"></nav>
+    </div>
+    <div class="nav-right">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.5" y2="16.5"></line>
+        </svg>
+        <input id="searchInput" type="text" placeholder="搜索视频" autocomplete="off">
+      </div>
+      <button id="refreshBtn" class="icon-btn" title="刷新媒体库">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12a9 9 0 1 1-2.64-6.36"></path><polyline points="21 3 21 9 15 9"></polyline>
+        </svg>
+      </button>
+      <button id="settingsBtn" class="icon-btn" title="设置媒体目录">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div id="loading" class="loading-wrap">
+    <div class="skeleton-hero shimmer"></div>
+    <div class="skeleton-row">
+      <div class="skeleton-title shimmer"></div>
+      <div class="skeleton-cards">
+        <div class="skeleton-card shimmer"></div><div class="skeleton-card shimmer"></div>
+        <div class="skeleton-card shimmer"></div><div class="skeleton-card shimmer"></div>
+        <div class="skeleton-card shimmer"></div><div class="skeleton-card shimmer"></div>
+      </div>
+    </div>
+  </div>
+
+  <section id="hero" class="hidden">
+    <div class="hero-bg">
+      <img id="heroImg" alt="">
+      <div class="hero-fade"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-tag">
+        <span class="hero-brand">STREAM</span>
+        <span class="hero-cat" id="heroCat"></span>
+      </div>
+      <h1 id="heroTitle"></h1>
+      <div class="hero-meta" id="heroMeta"></div>
+      <p class="hero-desc" id="heroDesc"></p>
+      <div class="hero-actions">
+        <button class="btn btn-play" id="heroPlay">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          播放
+        </button>
+        <button class="btn btn-info" id="heroInfo">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12.5"></line><circle cx="12" cy="8.2" r="1.1" fill="currentColor" stroke="none"></circle>
+          </svg>
+          详细信息
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <main id="rows"></main>
+
+  <div id="emptyState" class="empty hidden">
+    <svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.2">
+      <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+      <path d="M10 9l5 3-5 3z" fill="currentColor" stroke="none"></path>
+    </svg>
+    <h2>媒体库是空的</h2>
+    <p>点击右上角 <b>设置</b> 图标，或</p>
+    <button class="btn btn-red empty-btn" id="emptySettingsBtn">选择媒体文件夹</button>
+  </div>
+
+  <footer class="footer">STREAM · 本地视频管理器</footer>
+
+  <!-- 播放器 -->
+  <div id="playerModal" class="player-modal">
+    <div class="player-top">
+      <div class="player-top-left">
+        <button id="playerClose" class="icon-btn" title="关闭 (Esc)">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4">
+            <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        <div class="player-title" id="playerTitle"></div>
+      </div>
+      <div class="player-switch">
+        <button id="prevBtn" class="btn btn-mini">上一部</button>
+        <button id="nextBtn" class="btn btn-mini">下一部</button>
+      </div>
+    </div>
+    <video id="videoEl" controls playsinline></video>
+    <div class="player-hint">空格 播放/暂停 · ← → 快退/快进 10s · F 全屏 · Esc 关闭</div>
+  </div>
+
+  <!-- 详情 -->
+  <div id="detailModal" class="modal-wrap hidden">
+    <div class="modal detail-modal">
+      <button class="modal-close" id="detailClose">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4">
+          <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <div class="detail-poster"><img id="detailImg" alt=""></div>
+      <div class="detail-body">
+        <h2 id="detailTitle"></h2>
+        <div class="detail-meta" id="detailMeta"></div>
+        <div class="detail-path" id="detailPath"></div>
+        <button class="btn btn-play detail-play" id="detailPlay">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          播放
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 设置 -->
+  <div id="settingsModal" class="modal-wrap hidden">
+    <div class="modal settings-modal">
+      <button class="modal-close" id="settingsClose">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4">
+          <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <h2>设置媒体目录</h2>
+      <p class="settings-tip">一级子目录将作为类别显示在顶栏，类别里的子文件夹是影片，影片内可包含分集目录</p>
+      <div class="input-row">
+        <input id="rootInput" type="text" spellcheck="false" placeholder="例如 D:\Movies">
+        <button class="btn btn-ghost" id="browseBtn">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+          </svg>
+          浏览…
+        </button>
+      </div>
+      <div class="settings-section">
+        <label class="settings-label">视频播放方式</label>
+        <div class="radio-group" id="playerModeGroup">
+          <label class="radio-item">
+            <input type="radio" name="playerMode" value="web">
+            <span class="radio-title">网页播放</span>
+            <span class="radio-desc">在浏览器内播放，支持连播与快捷键</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="playerMode" value="system">
+            <span class="radio-title">系统播放器</span>
+            <span class="radio-desc">调用下方选择的外部播放器打开</span>
+          </label>
+        </div>
+      </div>
+      <div class="settings-section" id="playerChoiceSection" hidden>
+        <label class="settings-label">播放器选择</label>
+        <div class="chip-group" id="playerChoiceGroup">
+          <label class="chip"><input type="radio" name="extPlayer" value="default"><span>系统默认</span></label>
+          <label class="chip"><input type="radio" name="extPlayer" value="vlc"><span>VLC</span></label>
+          <label class="chip"><input type="radio" name="extPlayer" value="mpv"><span>MPV</span></label>
+          <label class="chip"><input type="radio" name="extPlayer" value="custom"><span>自定义…</span></label>
+        </div>
+        <div class="input-row custom-path-row hidden" id="customPathRow">
+          <input id="playerPathInput" type="text" spellcheck="false" placeholder="例如 C:\Program Files\PotPlayer\PotPlayerMini64.exe">
+          <button class="btn btn-ghost" id="browseExeBtn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg>
+            浏览…
+          </button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <label class="settings-label">封面预览卡片</label>
+        <div class="pref-grid">
+          <div class="pref-sub">大小</div>
+          <div class="chip-group" id="cardSizeGroup">
+            <label class="chip"><input type="radio" name="cardSize" value="small"><span>小</span></label>
+            <label class="chip"><input type="radio" name="cardSize" value="medium"><span>中</span></label>
+            <label class="chip"><input type="radio" name="cardSize" value="large"><span>大</span></label>
+          </div>
+          <div class="pref-sub">比例</div>
+          <div class="chip-group" id="cardRatioGroup">
+            <label class="chip"><input type="radio" name="cardRatio" value="16:9"><span>16:9</span></label>
+            <label class="chip"><input type="radio" name="cardRatio" value="21:9"><span>21:9</span></label>
+            <label class="chip"><input type="radio" name="cardRatio" value="4:3"><span>4:3</span></label>
+            <label class="chip"><input type="radio" name="cardRatio" value="3:4"><span>3:4</span></label>
+            <label class="chip"><input type="radio" name="cardRatio" value="9:16"><span>9:16</span></label>
+          </div>
+          <div class="pref-sub">名称</div>
+          <div class="chip-group" id="cardTitleGroup">
+            <label class="chip"><input type="radio" name="cardTitle" value="on"><span>直接显示</span></label>
+            <label class="chip"><input type="radio" name="cardTitle" value="off"><span>悬停显示</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <label class="settings-label">个人数据</label>
+        <p class="settings-tip">导出或导入观看历史与自定义栏目（JSON 文件），导入会覆盖现有数据</p>
+        <div class="data-row">
+          <button class="btn btn-ghost" id="exportDataBtn">导出数据</button>
+          <button class="btn btn-ghost" id="importDataBtn">导入数据</button>
+          <input type="file" id="importDataFile" accept=".json,application/json" hidden>
+        </div>
+      </div>
+      <div class="settings-section">
+        <label class="settings-label">封面</label>
+        <p class="settings-tip">删除全部自动生成的封面并重新提取（耗时较长，后台进行）</p>
+        <div class="data-row">
+          <button class="btn btn-ghost" id="regenThumbsBtn">重新生成预览图</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <label class="settings-label">局域网模式</label>
+        <div class="chip-group" id="lanGroup">
+          <label class="chip"><input type="radio" name="lanMode" value="off"><span>关闭</span></label>
+          <label class="chip"><input type="radio" name="lanMode" value="on"><span>开启</span></label>
+        </div>
+        <p class="settings-tip" id="lanTip">开启后同一局域网内的设备可访问本媒体库（重启应用后生效）</p>
+      </div>
+      <div class="settings-error hidden" id="settingsError"></div>
+      <div class="settings-actions">
+        <button class="btn btn-ghost" id="settingsCancel">取消</button>
+        <button class="btn btn-red" id="settingsSave">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 新建栏目输入 -->
+  <div id="nameModal" class="modal-wrap hidden">
+    <div class="modal name-modal">
+      <button class="modal-close" id="nameClose">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4">
+          <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <h2 id="nameTitle">新建栏目</h2>
+      <p class="settings-tip" id="nameTip">为栏目取一个名称</p>
+      <input id="nameInput" type="text" spellcheck="false" maxlength="40" placeholder="栏目名称">
+      <div class="settings-error hidden" id="nameError"></div>
+      <div class="settings-actions">
+        <button class="btn btn-ghost" id="nameCancel">取消</button>
+        <button class="btn btn-red" id="nameOk">创建</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 确认弹窗 -->
+  <div id="confirmModal" class="modal-wrap hidden">
+    <div class="modal name-modal">
+      <h2 id="confirmTitle">确认操作</h2>
+      <p class="settings-tip" id="confirmTip"></p>
+      <div class="settings-error hidden" id="confirmError"></div>
+      <div class="settings-actions">
+        <button class="btn btn-ghost" id="confirmCancel">取消</button>
+        <button class="btn btn-red" id="confirmOk">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="/static/js/app.js?v=21"></script>
+</body>
+</html>
