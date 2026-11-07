@@ -2,6 +2,9 @@
 
 Netflix 风格的本地视频管理器：扫描本地（或 NAS/UNC 路径）视频目录，自动生成封面墙，浏览器内直接流式播放。FastAPI 后端 + 原生 JavaScript 前端，无任何前端框架依赖。
 
+<img width="2559" height="1439" alt="屏幕截图 2026-11-07 174156" src="https://github.com/user-attachments/assets/e77962fb-5dfe-4286-a008-358b8b2be638" />
+<img width="2559" height="1439" alt="屏幕截图 2026-11-07 174114" src="https://github.com/user-attachments/assets/2d8efae6-9dfd-44c4-9f9c-2d6fc6580192" />
+
 ## 下载发行版
 
 无需安装 Python，直接从 [Releases](https://github.com/bairain/stream/releases) 下载：
